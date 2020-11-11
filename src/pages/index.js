@@ -1,22 +1,51 @@
 import React from "react"
 import { Link } from "gatsby"
-
-import Layout from "../components/layout"
-import Image from "../components/image"
+import firebase from 'firebase';
+import * as firebaseui from 'firebaseui'
+import Nav from '../components/nav'
 import SEO from "../components/seo"
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link> <br />
-    <Link to="/using-typescript/">Go to "Using TypeScript"</Link>
-  </Layout>
-)
+export default function IndexPage(){
 
-export default IndexPage
+  !firebase.apps.length && firebase.initializeApp({
+    apiKey: 'AIzaSyCPVubMZ9UNNbLTHr8EED_rN9lwzb4Hx98',
+    authDomain: 'https://console.firebase.google.com/project/starterscode/firestore',
+    projectId: 'starterscode',
+  });
+
+  var db = firebase.firestore();
+
+  var uiConfig = {
+    signInSuccessUrl: '<url-to-redirect-to-on-success>',
+    signInOptions: [
+      // Leave the lines as is for the providers you want to offer your users.
+      firebase.auth.EmailAuthProvider.PROVIDER_ID,
+    ],
+    // tosUrl and privacyPolicyUrl accept either url string or a callback
+    // function.
+    // Terms of service url/callback.
+    tosUrl: '/plates',
+    // Privacy policy url/callback.
+    privacyPolicyUrl: function() {
+      window.location.assign('/plates');
+    }
+  };
+
+  // Initialize the FirebaseUI Widget using Firebase.
+  !firebase.apps.length && firebaseui.auth.AuthUI(firebase.auth()).start('#firebaseui-auth-container', uiConfig);
+  // The start method will wait until the DOM is loaded.
+/*   ui.start('#firebaseui-auth-container', uiConfig); */
+
+!firebase.apps.length && firebaseui.auth.AuthUI(firebase.auth()).isPendingRedirect() &&
+    firebaseui.auth.AuthUI(firebase.auth()).start('#firebaseui-auth-container', uiConfig);
+
+  return(
+      <>
+      <SEO title="Starterscode" />
+      <Nav />
+      <div id="editor">
+      </div>
+      <div id="firebaseui-auth-container"></div>
+    </>
+  )
+}
